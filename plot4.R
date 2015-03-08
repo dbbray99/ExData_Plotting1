@@ -1,5 +1,5 @@
-plot1 <- function() {
-        ## Assignment 1 plot 2
+plot4 <- function() {
+## Assignment 1 plot 4
         # Get file and unzip
         fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
         download.file(fileUrl, destfile ="hpc.zip", method = "curl")
@@ -14,9 +14,19 @@ plot1 <- function() {
         hpcData <- read.table("household_power_consumption.txt", colClasses=classes, sep=";", na.strings="?", header = FALSE, skip=66637, nrows=2880, stringsAsFactors=TRUE)
         # combine header and data
         colnames( hpcData ) <- unlist(header)
-        # open output device and create
-        png(file = "plot1.png", height=480, width=480)
-        hist(hpcData$Global_active, xlab="Global Active Power (kilowatts)", ylab="Frequency", main="Global Active Power", col="red")
-        # close output device
+        # Tidy data for analyis
+        hpcData$Date <- strptime(hpcData$Date, format="%e/%m/%Y") # format loaded date
+        hpcData$compDay <- paste(hpcData$Date,hpcData$Time) # add combined Date and Time
+        hpcData$compDay <- as.POSIXct(hpcData$compDay) # format combined date and time so Day can be determined            
+        # Establish output device (png format)
+        png(file = "plot4.png", height=480, width=480)
+        # Create Plots
+        par(mfrow=c(2,2))
+        plot(hpcData$compDay, hpcData$Global_active, ylab="Global Active Power", xlab="", type='l')
+        plot(hpcData$compDay, hpcData$Voltage, ylab="Voltage", xlab="datetime", type="l")
+        plot(hpcData$compDay, hpcData$Sub_metering_3, ylab="Engery sub metering", xlab="", type="l", col="blue")
+        legend("topright", col=c("black", "red", "blue"), legend = c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), lty=c(1,1,1), lwd=c(2.5,2.5,2.5))
+        plot(hpcData$compDay, hpcData$Global_reactive_power, ylab="Global_reactive_power", xlab="datetime", type="l")
+        # Close ouput device
         dev.off()
 }
